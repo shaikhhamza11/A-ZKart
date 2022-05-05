@@ -1,6 +1,6 @@
 import { useParams } from "react-router-dom"
-import products from "../constants/products"
 const ProductDescription = () => {
+  const products = []
   const params = useParams()
   const product = products.find((product) => product.id === Number(params.id))
   return (
