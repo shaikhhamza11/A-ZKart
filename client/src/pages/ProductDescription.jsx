@@ -1,11 +1,38 @@
 import { useParams } from "react-router-dom"
+import { useEffect } from "react"
+import { useDispatch, useSelector } from "react-redux"
+import { fetchSingleProduct } from "../features/products/productSlice"
+import { STATUS } from "../constants/status"
+import { Loading } from "../components/componentsExport"
+import { removeSingleProduct } from "../features/products/productSlice"
+import { Link } from "react-router-dom"
 const ProductDescription = () => {
-  const products = []
   const params = useParams()
-  const product = products.find((product) => product.id === Number(params.id))
-  return (
+
+  const dispatch = useDispatch()
+
+  const { status, singleProduct: product } = useSelector(
+    (state) => state.product
+  )
+
+  useEffect(() => {
+    dispatch(fetchSingleProduct(params.id))
+    return () => {
+      console.log("unmount")
+      dispatch(removeSingleProduct())
+    }
+  }, [dispatch, params.id])
+
+  return status === STATUS.LOADING ? (
+    <Loading />
+  ) : status === STATUS.ERROR ? (
+    <h1>Something went wrong</h1>
+  ) : (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
       <div className="h-full bg-base-100 p-4 md:col-start-1 md:col-end-3">
+        <Link to="/" className="btn btn-outline">
+          Back To Search
+        </Link>
         <div className="card shadow-lg p-8">
           <h1 className="card-title mb-4">{product.name}</h1>
           <figure className="md:w-2/4">
