@@ -1,12 +1,17 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit"
 import { STATUS } from "../../constants/status"
-import axios from "axios"
-
+import productService from "./productService"
 // thunk
-export const fetchAllProducts = createAsyncThunk("products/fetch", async () => {
-  const { data } = await axios("/api/products/getAllProducts")
-  return data
-})
+export const fetchAllProducts = createAsyncThunk(
+  "products/fetch",
+  async (arg, thunkApi) => {
+    try {
+      return await productService.getAllProducts()
+    } catch (e) {
+      return thunkApi.rejectWithValue("No products")
+    }
+  }
+)
 export const fetchSingleProduct = createAsyncThunk(
   "products/fetchSingleProducts",
   async (prodId, thunkApi) => {
@@ -14,9 +19,7 @@ export const fetchSingleProduct = createAsyncThunk(
       const params = new URLSearchParams({
         id: prodId,
       })
-      const { data } = await axios(`/api/products/getSingleProduct?${params}`)
-      console.log(data)
-      return data
+      return await productService.getSingleProduct(params)
     } catch (e) {
       console.log(e)
       return thunkApi.rejectWithValue("Something went wrong")
@@ -55,7 +58,6 @@ const productSlice = createSlice({
       state.status = STATUS.IDLE
     },
     [fetchSingleProduct.rejected]: (state, action) => {
-      console.log(action)
       state.status = STATUS.ERROR
     },
   },

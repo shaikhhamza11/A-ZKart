@@ -5,3 +5,13 @@
 .min-w-80{
     min-width: 80%;
 }
+
+
+.titles,.cart-item {
+display: grid;
+grid-template-columns: 3fr 1fr 1fr 1fr;
+align-items: center;
+column-gap: 0.9rem;
+}
+
+

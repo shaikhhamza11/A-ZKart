@@ -1,24 +1,30 @@
 import { useParams } from "react-router-dom"
-import { useEffect } from "react"
+import { useEffect, useState } from "react"
 import { useDispatch, useSelector } from "react-redux"
 import { fetchSingleProduct } from "../features/products/productSlice"
 import { STATUS } from "../constants/status"
 import { Loading } from "../components/componentsExport"
 import { removeSingleProduct } from "../features/products/productSlice"
 import { Link } from "react-router-dom"
-const ProductDescription = () => {
-  const params = useParams()
+import { addToCart } from "../features/cart/cartSlice"
 
+const ProductDescription = () => {
+  const [quantity, setQuantity] = useState(1)
+  const params = useParams()
   const dispatch = useDispatch()
 
   const { status, singleProduct: product } = useSelector(
     (state) => state.product
   )
 
+  const handleAddCart = (product, quantity) => {
+    const payload = { ...product, quantity }
+    dispatch(addToCart(payload))
+  }
+
   useEffect(() => {
     dispatch(fetchSingleProduct(params.id))
     return () => {
-      console.log("unmount")
       dispatch(removeSingleProduct())
     }
   }, [dispatch, params.id])
@@ -26,9 +32,9 @@ const ProductDescription = () => {
   return status === STATUS.LOADING ? (
     <Loading />
   ) : status === STATUS.ERROR ? (
-    <h1>Something went wrong</h1>
+    <h1 className="mt-24">Something went wrong</h1>
   ) : (
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
+    <div className=" grid grid-cols-1 md:grid-cols-3 gap-2 mt-24">
       <div className="h-full bg-base-100 p-4 md:col-start-1 md:col-end-3">
         <Link to="/" className="btn btn-outline">
           Back To Search
@@ -53,7 +59,11 @@ const ProductDescription = () => {
           <h1 className="font-bold my-2">Price:{product.price}</h1>
           <hr />
           <h1 className=" font-bold my-2">Select quantity</h1>
-          <select className="select select-primary my-4 ">
+          <select
+            className="select select-primary my-4"
+            value={quantity}
+            onChange={(e) => setQuantity(+e.target.value)}
+          >
             {[...Array(product.countInStock).keys()].map((count, i) => (
               <option value={i + 1} key={count}>
                 {i + 1}
@@ -61,7 +71,10 @@ const ProductDescription = () => {
             ))}
           </select>
 
-          <div className="btn btn-sm md:btn-md rounded-none btn-primary mt-2">
+          <div
+            className="btn btn-sm md:btn-md rounded-none btn-primary mt-2"
+            onClick={() => handleAddCart(product, quantity)}
+          >
             Add to Cart
           </div>
         </div>
