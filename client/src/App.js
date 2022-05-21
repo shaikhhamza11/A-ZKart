@@ -14,7 +14,7 @@ const App = () => {
         <Route path="/*" element={<NotFound />} />
         <Route path="/product/:id" element={<ProductDescription />} />
       </Routes>
-      <ToastContainer limit={3} autoClose={200} />
+      <ToastContainer limit={3} autoClose={5000} />
     </Router>
   )
 }

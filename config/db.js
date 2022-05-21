@@ -8,7 +8,7 @@ const connectDb = async () => {
     })
     console.log(chalk.cyan.bold(`Mongo Connected: ${conn.connection.host}`))
   } catch (err) {
-    console.log(err)
+    console.log(chalk.cyan.red(`Mongo Disconnected: ${err}`))
     process.exit(1)
   }
 }
