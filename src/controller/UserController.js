@@ -4,6 +4,7 @@ const CustomError = require("../utils/CustomError")
 const UserCollection = require("../model/user")
 const bcrypt = require("bcrypt")
 const generateToken = require("../utils/generateToken")
+
 exports.register = asyncHandler(async (req, res) => {
   const schema = Joi.object({
     name: Joi.string().min(3).max(20).required(),
@@ -14,23 +15,29 @@ exports.register = asyncHandler(async (req, res) => {
   if (error) {
     const err = new CustomError(error.message, 400)
     const { message, statusCode } = err
-    return res.status(401).json({ error: { message, statusCode } })
+    return res.status(400).json({ error: { message, statusCode } })
   }
-  let user = await UserCollection.findOne({ email: value.email })
-  if (user) return res.status(400).send("User already exists")
   const { name, email, password } = value
-  user = new UserCollection({
+  let user = await UserCollection.findOne({ email })
+  if (user) return res.status(400).send("User already exists")
+  user = await UserCollection.create({
     name,
     email,
     password,
   })
-
-  const salt = await bcrypt.genSalt(11)
-  user.password = await bcrypt.hash(user.password, salt)
-  const token = generateToken(user)
-
-  user = await user.save()
-  res.status(200).send(token)
+  if (user) {
+    const salt = await bcrypt.genSalt(11)
+    user.password = await bcrypt.hash(user.password, salt)
+    const token = generateToken(user)
+    console.log(user)
+    user = await user.save()
+    res.status(201).json({
+      _id: user.id,
+      name: user.name,
+      email: user.email,
+      token: generateToken(user.id),
+    })
+  }
 })
 exports.login = asyncHandler(async (req, res) => {
   const schema = Joi.object({
@@ -56,6 +63,14 @@ exports.login = asyncHandler(async (req, res) => {
     const { message, statusCode } = err
     return res.status(401).json({ error: { message, statusCode } })
   }
-  const token = generateToken(user)
-  res.status(200).send(token)
+
+  res.status(200).json({
+    _id: user.id,
+    name: user.name,
+    email: user.email,
+    token: generateToken(user.id),
+  })
+})
+exports.checkToken = asyncHandler(async (req, res) => {
+  res.send(req.user)
 })

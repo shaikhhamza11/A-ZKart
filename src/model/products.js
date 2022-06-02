@@ -4,17 +4,19 @@ const ratingSchema = mongoose.Schema(
   {
     userId: {
       type: mongoose.Schema.Types.ObjectId,
+      required: true,
+      ref: "User",
     },
     name: {
       type: String,
-      require: true,
+      required: true,
     },
     comments: {
       type: String,
     },
     rating: {
       type: Number,
-      require: true,
+      required: true,
     },
   },
   {
@@ -26,15 +28,15 @@ const productSchema = mongoose.Schema(
   {
     name: {
       type: String,
-      require: true,
+      required: [true, "Please add a name"],
     },
     image: {
       type: String,
-      require: true,
+      required: true,
     },
     category: {
       type: String,
-      require: true,
+      required: true,
     },
     description: {
       type: String,
@@ -42,11 +44,11 @@ const productSchema = mongoose.Schema(
     },
     price: {
       type: Number,
-      require: true,
+      required: true,
     },
     rating: {
       type: Number,
-      require: true,
+      required: true,
     },
     reviews: [ratingSchema],
   },

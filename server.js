@@ -29,7 +29,7 @@ app.use(mongoSanitize())
 // routes
 
 app.use("/api/products", require("./src/routes/products"))
-app.use("/api/user", require("./src/routes/users"))
+app.use("/api/users", require("./src/routes/users"))
 
 app.listen(PORT, () =>
   console.log(chalk.red.bold(`Server is listening at port ${PORT}`))
